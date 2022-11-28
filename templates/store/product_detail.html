@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+    
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+        <div class="row no-gutters">
+            <aside class="col-md-6">
+    <article class="gallery-wrap"> 
+        <div class="img-big-wrap mainImage">
+          {% comment %} <center> <img src="{{single_product.images.url}}"></center> {% endcomment %}
+          <div id="img-container">
+            <div id="lens"></div>
+            <img id="featured" src="{{single_product.images.url}}" class='img-fluid'>
+        </div>
+        </div> <!-- img-big-wrap.// -->
+        
+    </article> <!-- gallery-wrap .end// -->
+    <ul class="thumb">
+        <li>
+            <a href="{{single_product.images.url}}" target="mainImage"><img id="asdfg" src="{{single_product.images.url}}" alt="Product Image" style="width:100px;height:120px;"></a>
+            {% for i in product_gallery %}
+            <a href="{{i.image.url}}" target="mainImage"><img id="asdfg" src="{{i.image.url}}" alt="Product Image" style="width:100px;height:120px;"></a>
+            {% endfor %}
+        </li>
+    </ul>
+            </aside>
+            <main class="col-md-6 border-left">
+        <form action="{% url 'add_cart' single_product.id %}" method ="POST">
+          {% csrf_token %}
+          <article class="content-body">
+    
+            <h2 class="title">{{single_product.product_name}}</h2>
+            
+            <div class="mb-3"> 
+                {% if single_product.offer_price == 0 %}
+                 <var class="price h4">₹{{single_product.price}}</var> 
+                {% else %}
+                 <var class="price h4">₹{{single_product.offer_price}}</var> 
+                {% endif %}
+            </div> 
+            
+            <p>{{single_product.description}}</p>
+            
+            
+            <hr>
+             
+                <div class="row">
+                    <div class="item-option-select">
+                        <h6>Select Size</h6>
+                         <select name="size" class="form-control" required>
+                          <option value="" disabled selected>Select</option>
+                          {%for i in single_product.variation_set.sizes %}
+                           <option value="{{i.variation_value  | lower }}">{{i.variation_value | capfirst }}</option>
+                          {%endfor%}
+                         </select>
+                    </div>
+                </div> 
+            <hr>
+                {% if single_product.stock <= 0 %}
+                  <h5 class="text-danger">Out Of Stock</h5>
+                  {% else %}
+                    <button type="submit"  class="btn  btn-primary"> <span class="text">Add to Cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+                {%endif%}
+                </article> <!-- product-info-aside .// -->
+        </form>
+            </main> <!-- col.// -->
+        </div> <!-- row.// -->
+    </div> <!-- card.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    
+    <br>
+    
+    <div class="row">
+                <div class="col-md-9">
+    
+        
+    
+        </div> <!-- col.// -->
+    </div> <!-- row.// -->
+    
+    
+    </div> <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    <style>
+        #img-container {
+            z-index: 1;
+            max-width: 500px;
+            position: relative;
+        }
+    
+        #lens {
+            z-index: 5;
+            position: absolute;
+    
+            height: 125px;
+            width: 125px;
+    
+            background-repeat: no-repeat;
+            cursor: none;
+    
+        }
+    </style>
+    <script>
+        document.getElementById('img-container').addEventListener('mouseover', function(){
+            imageZoom('featured')
+            
+        })
+        
+        function imageZoom(imgID){
+            let img = document.getElementById(imgID)
+            let lens = document.getElementById('lens')
+        
+            lens.style.backgroundImage = `url( ${img.src} )`
+        
+            let ratio = 3
+        
+            lens.style.backgroundSize = (img.width * ratio) + 'px ' + (img.height * ratio) + 'px';
+        
+            img.addEventListener("mousemove", moveLens)
+            lens.addEventListener("mousemove", moveLens)
+            img.addEventListener("touchmove", moveLens)
+        
+            function moveLens(){
+                /*
+                Function sets sets position of lens over image and background image of lens
+                1 - Get cursor position
+                2 - Set top and left position using cursor position - lens width & height / 2
+                3 - Set lens top/left positions based on cursor results
+                4 - Set lens background position & invert
+                5 - Set lens bounds
+            
+                */
+        
+                //1
+                let pos = getCursor()
+                //console.log('pos:', pos)
+        
+                //2
+                let positionLeft = pos.x - (lens.offsetWidth / 2)
+                let positionTop = pos.y - (lens.offsetHeight / 2)
+        
+                //5
+                if(positionLeft < 0 ){
+                    positionLeft = 0
+                }
+        
+                if(positionTop < 0 ){
+                    positionTop = 0
+                }
+        
+                if(positionLeft > img.width - lens.offsetWidth /3 ){
+                    positionLeft = img.width - lens.offsetWidth /3
+                }
+        
+                if(positionTop > img.height - lens.offsetHeight /3 ){
+                    positionTop = img.height - lens.offsetHeight /3
+                }
+        
+        
+                //3
+                lens.style.left = positionLeft + 'px';
+                lens.style.top = positionTop + 'px';
+        
+                //4
+                lens.style.backgroundPosition = "-" + (pos.x * ratio) + 'px -' +  (pos.y * ratio) + 'px'
+            }
+        
+            function getCursor(){
+                /* Function gets position of mouse in dom and bounds
+                 of image to know where mouse is over image when moved
+                
+                1 - set "e" to window events
+                2 - Get bounds of image
+                3 - set x to position of mouse on image using pageX/pageY - bounds.left/bounds.top
+                4- Return x and y coordinates for mouse position on image
+                
+                 */
+        
+                let e = window.event
+                let bounds = img.getBoundingClientRect()
+        
+                //console.log('e:', e)
+                //console.log('bounds:', bounds)
+                let x = e.pageX - bounds.left
+                let y = e.pageY - bounds.top
+                x = x - window.pageXOffset;
+                y = y - window.pageYOffset;
+                
+                return {'x':x, 'y':y}
+            }
+        
+        }
+        
+        imageZoom('featured') </script>
+    {% endblock content %}
