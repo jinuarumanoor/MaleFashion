@@ -435,14 +435,14 @@ def delete_product(request, id):
 def category_offer(request):
     offers = CategoryOffer.objects.order_by("id").all()
     return render(
-        request, "admin/existing_category_Offer.html", {"offers": offers}
+        request, "admin/existing_category_offer.html", {"offers": offers}
     )
 
 
 @login_required(login_url='adminlogin')
 def product_offer(request):
     offers = ProductOffer.objects.order_by("id").all()
-    return render(request, "admin/existing_product_Offer.html", {"offers": offers})
+    return render(request, "admin/existing_product_offer.html", {"offers": offers})
 
 
 
