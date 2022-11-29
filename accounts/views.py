@@ -78,12 +78,13 @@ def confirm_signup(request):
             )
             user.is_active = True
             user.phone_number = phone_number
-            # Create a user profile
-            # profile = UserProfile()
-            # profile.user_id = user.id
-            # profile.profile_picture = "default/avatar.png"
-            # profile.save()
             user.save()
+            # Create a user profile
+            profile = UserProfile()
+            profile.user_id = user.id
+            profile.profile_picture = "default/avatar.png"
+            profile.save()
+            
             messages.success(request, "Registered successfully")
             return redirect("login")
         else:
